@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "o4n+29NKTtZgZIhZOsfisVL9GyuCOVE0Dw8PKe9Hwhy+q7ituqrHCLiVyRqeKkPWjx2f3liQDrJTq8lRDs0Zfg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\s2001067\\source\\repos\\MightyMadness\\MightyMadness\\MightyMadness.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\s2001067\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
