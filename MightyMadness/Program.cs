@@ -1,4 +1,8 @@
 ﻿using MightyMadness;
+using System;
+
+Console.BackgroundColor = ConsoleColor.Red;
+Console.ForegroundColor = ConsoleColor.Black;
 
 Battlecontrol mainBattle = new();
 
