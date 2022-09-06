@@ -3,29 +3,50 @@
     {
       "name": "Skeleton Warrior",
       "stats": {
-        "damage": 10,
         "health": 100,
         "mana": 0,
-        "defence": 10
-      }
+        "defence": 5
+      },
+      "skills": [
+        {
+          "name": "Bone Strike",
+          "damage": 10,
+          "manacost": 0,
+          "speciality": 0
+        }
+      ]
     },
     {
       "name": "Skeleton Mage",
       "stats": {
-        "damage": 20,
         "health": 80,
         "mana": 0,
-        "defence": 10
-      }
+        "defence": 5
+      },
+      "skills": [
+        {
+          "name": "Necrotic Bolt",
+          "damage": 10,
+          "manacost": 0,
+          "speciality": 0
+        }
+      ]
     },
     {
       "name": "Skeleton Assassin",
       "stats": {
-        "damage": 25,
         "health": 75,
         "mana": 20,
-        "defence": 5
-      }
+        "defence": 0
+      },
+      "skills": [
+        {
+          "name": "Marrow Stab",
+          "damage": 20,
+          "manacost": 0,
+          "speciality": 0
+        }
+      ]
     }
   ]
 }

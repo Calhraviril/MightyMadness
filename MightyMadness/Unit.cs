@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MightyMadness
+﻿namespace MightyMadness
 {
     public class Unit
     {
-        private int damage;
+        // The actual stored data
         private int hp;
         private int mana;
         private int defence;
@@ -17,25 +11,28 @@ namespace MightyMadness
         private int curHealth;
         private int curMana;
 
-        public Unit(string name, int damage, int health, int mana, int defence)
+        public List<Skill> skills;
+        
+        // Data
+        public Unit(string name, int health, int mana, int defence, List<Skill> skills)
         {
             this.name = name;
             this.hp = health;
-            this.damage = damage;
             this.defence = defence;
             this.mana = mana;
 
             this.curHealth = this.hp;
             this.curMana = this.mana;
+
+            this.skills = skills;
         }
+        // Combat specifics
         public void Receive(int received)
         {
             curHealth = curHealth - (received - defence);
         }
-        public void Attack(Unit target)
-        {
-            target.Receive(damage);
-        }
+
+        // Misc
         public bool Dead()
         {
             if (curHealth <= 0) return true;
@@ -44,6 +41,15 @@ namespace MightyMadness
         public string Namer()
         {
             return name;
+        }
+        public string SkillCall()
+        {
+            string returnable = "";
+            foreach (Skill skill in skills)
+            {
+                returnable = returnable + skill.Name + ", ";
+            }
+            return returnable;
         }
     }
 }

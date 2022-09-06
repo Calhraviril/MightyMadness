@@ -3,29 +3,50 @@
     {
       "name": "Rogue",
       "stats": {
-        "damage": 30,
         "health": 100,
         "mana": 100,
         "defence": 0
-      }
+      },
+      "skills": [
+        {
+          "name": "Stab",
+          "damage": 30,
+          "manacost": 10,
+          "speciality": 0
+        }
+      ]
     },
     {
       "name": "Alchemist",
       "stats": {
-        "damage": 25,
         "health": 100,
         "mana": 100,
         "defence": 5
-      }
+      },
+      "skills": [
+        {
+          "name": "Black Concoction",
+          "damage": 25,
+          "manacost": 10,
+          "speciality": 1
+        }
+      ]
     },
     {
       "name": "Harbitant",
       "stats": {
-        "damage": 20,
         "health": 100,
         "mana": 80,
         "defence": 10
-      }
+      },
+      "skills": [
+        {
+          "name": "Strike",
+          "damage": 20,
+          "manacost": 0,
+          "speciality": 0
+        }
+      ]
     }
   ]
 }
