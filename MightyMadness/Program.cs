@@ -48,7 +48,7 @@ while (true)
     foreach (Unit unit in mainBattle.enemies)
     {
         o++;
-        writer.WriteColored(o + ". ", ConsoleColor.White, unit.Namer(), null, " ");
+        writer.WriteColored(o + ". ", ConsoleColor.Gray, unit.Namer(), null, " ");
     }
     Console.WriteLine("");
     int attacked = Convert.ToInt32(Console.ReadKey().KeyChar.ToString()) - 1;

@@ -20,5 +20,6 @@
         public string Name { get { return name; } }
         public int Damage { get { return damage; } }
         public int Speciality { get { return speciality; } }
+        public int ManaCost { get { return manaCost; } }
     }
 }

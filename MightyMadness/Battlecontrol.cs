@@ -49,14 +49,13 @@ namespace MightyMadness
             Console.Write("Your units are: ");
             foreach (Unit unit in allies)
             {
-                Console.Write(unit.Namer() + ": ");
-                Console.Write(unit.SkillCall() + "/ ");
+                writer.WriteColored(ConsoleColor.White, unit.Namer(), null, ": ", ConsoleColor.White, unit.SkillCall(), null, "/ ");
             }
             Console.WriteLine("");
             Console.Write("Your enemies are: ");
             foreach (Unit unit in enemies)
             {
-                Console.Write(unit.Namer() + ", ");
+                writer.WriteColored(ConsoleColor.Gray, unit.Namer(), null, ": ");
             }
             Console.WriteLine("");
         }
@@ -88,30 +87,33 @@ namespace MightyMadness
         public void Attack(Unit attacked, Unit attacker, int skillChosen)
         {
             Skill choseSkill = attacker.skills[skillChosen];
-            switch (choseSkill.Speciality)
+            if (attacker.UseSkill(choseSkill))
             {
-                case 0: // Single Target
-                    attacked.Receive(choseSkill.Damage);
-                    break;
-                case 1: // Area Attack
-                    if (enemies.Contains(attacked))
-                    {
-                        foreach (Unit foe in enemies)
+                switch (choseSkill.Speciality)
+                {
+                    case 0: // Single Target
+                        attacked.Receive(choseSkill.Damage);
+                        break;
+                    case 1: // Area Attack
+                        if (enemies.Contains(attacked))
                         {
-                            foe.Receive(choseSkill.Damage);
+                            foreach (Unit foe in enemies)
+                            {
+                                foe.Receive(choseSkill.Damage);
+                            }
                         }
-                    }
-                    else if (allies.Contains(attacked))
-                    {
-                        foreach (Unit foe in allies)
+                        else if (allies.Contains(attacked))
                         {
-                            foe.Receive(choseSkill.Damage);
+                            foreach (Unit foe in allies)
+                            {
+                                foe.Receive(choseSkill.Damage);
+                            }
                         }
-                    }
-                    break;
-                default:
-                    Console.WriteLine("Something has gone wrong with using the skill");
-                    break;
+                        break;
+                    default:
+                        Console.WriteLine("Something has gone wrong with using the skill");
+                        break;
+                }
             }
         }
         // Checks for if someone has died

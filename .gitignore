@@ -50,3 +50,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Other stuff i found to be unneeded
+*.vsidx
+
+.vs/MightyMadness/v17/.suo
