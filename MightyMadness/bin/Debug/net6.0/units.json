@@ -11,7 +11,7 @@
         {
           "name": "Stab",
           "damage": 30,
-          "manacost": 10,
+          "manacost": 0,
           "speciality": 0
         }
       ]
@@ -27,7 +27,7 @@
         {
           "name": "Black Concoction",
           "damage": 25,
-          "manacost": 10,
+          "manacost": 0,
           "speciality": 1
         }
       ]

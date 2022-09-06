@@ -71,7 +71,7 @@ namespace MightyMadness
             }
 
             // Players attack
-            Attack(allies[attacker], enemies[attacked], skill);
+            Attack(enemies[attacked], allies[attacker], skill);
             Console.WriteLine(allies[attacker].Namer() + " attacked " + enemies[attacked].Namer());
 
             // Random values x 2

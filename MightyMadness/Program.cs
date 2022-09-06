@@ -16,7 +16,6 @@ mainBattle.ManifestArmy(3);
 // The battle itself
 while (true)
 {
-    Console.Clear();
     mainBattle.ListArmies();
     // Choose Unit
     Console.Write("Your turn: ");

@@ -53,14 +53,14 @@
         }
         public bool UseSkill(Skill skill)
         {
-            if (skill.ManaCost > curMana)
+            if (skill.ManaCost <= curMana)
             {
-                Console.WriteLine("Casted " + skill.Name + " for " + skill.ManaCost + ", leaving you with " + curMana);
+                Console.WriteLine(name + " casted " + skill.Name + " for " + skill.ManaCost + ", leaving " + curMana);
                 curMana = curMana - skill.ManaCost;
-                return false;
+                return true;
             }
             Console.WriteLine("Failed to cast " + skill.Name);
-            return true;
+            return false;
         }
     }
 }
