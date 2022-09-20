@@ -5,11 +5,12 @@
       "stats": {
         "health": 100,
         "mana": 100,
-        "defence": 0
+        "defence": 0,
+        "speed": 1
       },
       "skills": [
         {
-          "name": "Stab",
+          "name": "Stab (Single)",
           "damage": 30,
           "manacost": 0,
           "speciality": 0
@@ -21,11 +22,12 @@
       "stats": {
         "health": 100,
         "mana": 100,
-        "defence": 5
+        "defence": 5,
+        "speed": 1
       },
       "skills": [
         {
-          "name": "Black Concoction",
+          "name": "Black Concoction (Area)",
           "damage": 25,
           "manacost": 0,
           "speciality": 1
@@ -37,11 +39,12 @@
       "stats": {
         "health": 100,
         "mana": 80,
-        "defence": 10
+        "defence": 10,
+        "speed": 1
       },
       "skills": [
         {
-          "name": "Strike",
+          "name": "Strike (Single)",
           "damage": 20,
           "manacost": 0,
           "speciality": 0

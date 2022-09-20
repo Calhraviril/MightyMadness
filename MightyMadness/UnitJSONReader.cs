@@ -19,6 +19,7 @@ namespace MightyMadness
         public int Health { get; set; }
         public int Mana { get; set; }
         public int Defence { get; set; }
+        public int Speed { get; set; }
     }
     
     //Skill Stuff

@@ -6,61 +6,52 @@
         private int hp;
         private int mana;
         private int defence;
+        private int speed;
         private string name;
 
-        private int curHealth;
-        private int curMana;
+        float curHealth;
+        float curMana;
 
         public List<Skill> skills;
-        
         // Data
-        public Unit(string name, int health, int mana, int defence, List<Skill> skills)
+        public Unit(string name, int health, int mana, int defence, int speed, List<Skill> skills)
         {
             this.name = name;
             this.hp = health;
             this.defence = defence;
             this.mana = mana;
+            this.speed = speed;
 
             this.curHealth = this.hp;
             this.curMana = this.mana;
 
             this.skills = skills;
+            this.speed = speed;
         }
         // Combat specifics
-        public void Receive(int received)
+        public bool Receive(int received)
         {
             curHealth = curHealth - (received - defence);
-        }
-
-        // Misc
-        public bool Dead()
-        {
             if (curHealth <= 0) return true;
             return false;
         }
-        public string Namer()
-        {
-            return name;
-        }
-        public string SkillCall()
-        {
-            string returnable = "";
-            foreach (Skill skill in skills)
-            {
-                returnable = returnable + skill.Name + ", ";
-            }
-            return returnable;
-        }
+
+        // Information Conversions
+        public string Name { get { return name; } }
+        public int Speed { get { return speed; } }
         public bool UseSkill(Skill skill)
         {
             if (skill.ManaCost <= curMana)
             {
-                Console.WriteLine(name + " casted " + skill.Name + " for " + skill.ManaCost + ", leaving " + curMana);
                 curMana = curMana - skill.ManaCost;
                 return true;
             }
             Console.WriteLine("Failed to cast " + skill.Name);
             return false;
+        }
+        public float LifePercentage()
+        {
+            return curHealth / hp * (float)100;
         }
     }
 }
