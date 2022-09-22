@@ -9,7 +9,7 @@
         private int speed;
         private string name;
 
-        float curHealth;
+        float curHp;
         float curMana;
 
         public List<Skill> skills;
@@ -22,7 +22,7 @@
             this.mana = mana;
             this.speed = speed;
 
-            this.curHealth = this.hp;
+            this.curHp = this.hp;
             this.curMana = this.mana;
 
             this.skills = skills;
@@ -31,8 +31,8 @@
         // Combat specifics
         public bool Receive(int received)
         {
-            curHealth = curHealth - (received - defence);
-            if (curHealth <= 0) return true;
+            curHp = curHp - (received - defence);
+            if (curHp <= 0) return true;
             return false;
         }
 
@@ -51,7 +51,7 @@
         }
         public float LifePercentage()
         {
-            return curHealth / hp * (float)100;
+            return curHp / hp * (float)100;
         }
     }
 }
