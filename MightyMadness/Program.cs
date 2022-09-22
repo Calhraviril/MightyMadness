@@ -66,6 +66,7 @@ void TrueBattle()
                 if (action == "z")
                 {
                     actionTurn--;
+                    Console.WriteLine("");
                 }
                 else
                 {
