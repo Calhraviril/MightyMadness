@@ -5,7 +5,14 @@ Console.BackgroundColor = ConsoleColor.Black;
 Console.ForegroundColor = ConsoleColor.Red;
 Console.Title = "Mighty Madness";
 
-Console.Clear();
+// Stupid stuff that i have to put here because "CTRL + Z was specifically asked", despite that being overcomplex and unnecessary
+ConsoleKeyInfo key;
+
+// Values and Bools
+bool selecting = true;
+int keyTurn = 0; // Selected key
+int skill = 0; // Stores chosen skill
+int target = 0; // Stores chosen target
 
 // Start stuff
 Battlecontrol mainBattle = new();
@@ -44,14 +51,11 @@ void TrueBattle()
         }
         if (mainBattle.allies.Contains(unit))
         {
-            bool selecting = true;
-            string action = "";
-            int actionTurn = 0; // Selected action
-            int skill = 0; // Stores chosen skill
-            int target = 0; // Stores chosen target
+            selecting = true;
+            keyTurn = 0;
             while (selecting)
             {
-                switch (actionTurn)
+                switch (keyTurn)
                 {
                     case 0:
                         writer.WriteColored(ConsoleColor.White, unit.Name, 0, " Choose skill:" + writer.WriteList((object[])unit.skills.ToArray()), 1);
@@ -62,31 +66,35 @@ void TrueBattle()
                     default:
                         break;
                 }
-                action = Console.ReadKey().KeyChar.ToString();
-                if (action == "z")
+                key = Console.ReadKey();
+                if (!CanBeCastToInt(key))
                 {
-                    actionTurn--;
-                    Console.WriteLine("");
+                    CommandInput();
                 }
                 else
                 {
-                    switch (actionTurn)
+                    if(keyTurn < 0) { keyTurn = 0; }
+                    switch (keyTurn)
                     {
                         case 0:
-                            skill = StringConvert(action) - 1;
+                            skill = StringConvert(key) - 1;
                             if (skill > unit.skills.Count) { skill = unit.skills.Count; }
                             Console.WriteLine("");
-                            actionTurn++;
+                            keyTurn++;
                             break;
                         case 1:
-                            target = StringConvert(action) - 1;
+                            target = StringConvert(key) - 1;
                             if (target > mainBattle.enemies.Count) { target = mainBattle.enemies.Count; }
                             Console.WriteLine("");
-                            actionTurn++;
-                            writer.WriteColored(ConsoleColor.Yellow, "Are you sure of these actions?", 1, "Press Z to return to previous decision", 1, "Press anything else to continue", 1, 0);
+                            keyTurn++;
+                            writer.WriteColored("Press CTRL + T at any time to open a tutorial listing", 1);
                             break;
                         case 2:
                             selecting = false;
+                            break;
+                        default :
+                            Console.WriteLine("Something has gone wrong");
+                            keyTurn++; // Just to make sure you did not somehow get a negative value
                             break;
                     }
                 }
@@ -101,14 +109,40 @@ void TrueBattle()
         mainBattle.ListArmies();
     }
 }
-int StringConvert(string convertable)
+int StringConvert(ConsoleKeyInfo convertable)
 {
     try
     {
-        return Convert.ToInt32(convertable);
+        return Convert.ToInt32(convertable.KeyChar.ToString());
     }
     catch
     {
         return 0;
     }
+}
+void CommandInput()
+{
+    if ((key.Modifiers & ConsoleModifiers.Control) != 0 && key.Key.ToString() == "Q")
+    {
+        keyTurn--;
+        HonsoleClear();
+        writer.WriteColored(1, "Reverting one choice backwards", 1, "If you reverted too far, just act as if you have to choose a skill. Ill fix it later", 1);
+    }
+    else if ((key.Modifiers & ConsoleModifiers.Control) != 0 && key.Key.ToString() == "T")
+    {
+        HonsoleClear();
+        writer.Tutor();
+    }
+}
+bool CanBeCastToInt(ConsoleKeyInfo choseKey)
+{
+    try { int conCheck = Convert.ToInt32(choseKey.KeyChar.ToString()); }
+    catch { return false; }
+    return true;
+}
+void HonsoleClear()
+{
+    Console.Clear();
+    mainBattle.ReadHistory();
+    mainBattle.ListArmies();
 }

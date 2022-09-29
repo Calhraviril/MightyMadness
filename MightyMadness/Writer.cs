@@ -58,5 +58,9 @@
             Console.BackgroundColor = ConsoleColor.Black;
             Console.Clear();
         }
+        public void Tutor()
+        {
+            WriteColored(ConsoleColor.White, "Once all actions are chosen, press any key without an already set use to complete the turn", 1, "Press CTRL + Z to revert a turn, despite it being stupid", 1, "Press CTRL + Q to revert a choice", 1, 0);
+        }
     }
 }
