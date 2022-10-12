@@ -1,45 +1,87 @@
 ﻿using Newtonsoft.Json;
-using static System.Net.Mime.MediaTypeNames;
 using MightyMadness;
 using System.Data;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+using System;
 
 namespace MightyMadness
 {
+    public static class DH // AKA: DataHandler
+    {
+        public static UnitJSONReader allyHandler = JsonConvert.DeserializeObject<UnitJSONReader>(File.ReadAllText(@".\units.json"));
+        public static UnitJSONReader foeHandler = JsonConvert.DeserializeObject<UnitJSONReader>(File.ReadAllText(@".\foes.json"));
+
+        public static ArmyData allies;
+        public static ArmyData enemies;
+        public static List<Unit> battleOrder;
+
+        public static List<string> history = new();
+        public static List<attackProtocol> protocols = new();
+
+        public enum BattleState
+        {
+            menu,
+            armyCreate,
+            battle,
+            gameOver
+        }
+    }
     public class Battlecontrol
     {
-        UnitJSONReader allyHandler = JsonConvert.DeserializeObject<UnitJSONReader>(File.ReadAllText(@".\units.json"));
-        UnitJSONReader foeHandler = JsonConvert.DeserializeObject<UnitJSONReader>(File.ReadAllText(@".\foes.json"));
         Random random = new();
         Writer writer = new();
-        public List<Unit> allies = new();
-        public List<Unit> enemies = new();
-        public List<Unit> battleOrder = new();
+
+        ArmyData Armed(List<Unit> addUnit)
+        {
+            ArmyData thisthing = new();
+
+            thisthing.units = addUnit;
+            thisthing.grave = new();
+            thisthing.Sort();
+
+            return thisthing;
+        }
+
         #region "Army creation"
         // Creates both armies
         public void ManifestArmy(int amount)
         {
-            for (int i = 0; i < amount; i++)
-            {
-                int chosen = random.Next(allyHandler.Units.Count);
-                var call = allyHandler.Units[chosen].Stats;
-                allies.Add(new Unit(allyHandler.Units[chosen].Name, call.Health, call.Mana, call.Defence, call.Speed, Skills(chosen, allyHandler)));
-            }
-            for (int i = 0; i < amount; i++)
-            {
-                int chosen = random.Next(foeHandler.Units.Count);
-                var call = foeHandler.Units[chosen].Stats;
-                enemies.Add(new Unit(foeHandler.Units[chosen].Name, call.Health, call.Mana, call.Defence, call.Speed, Skills(chosen, foeHandler)));
-            }
+            ManifestAlly(amount);
+            ManifestEnemy(amount);
             SetBattleOrder();
         }
-        // Set order of attackers
-        private void SetBattleOrder()
+        private void ManifestAlly(int amount)
         {
-            List<Unit> packList = new();
-            packList.AddRange(allies);
-            packList.AddRange(enemies);
-            battleOrder = packList.OrderBy(o => o.Speed).ToList();
+            List<Unit> alli = new List<Unit>();
+            while (true)
+            {
+                Console.Clear();
+                writer.WriteColored("Choose an unit ", 1, writer.ListJsonUnit());
+                int input = Convert.ToInt32(Console.ReadKey().KeyChar.ToString());
+
+                var call = DH.allyHandler.Units[input].Stats;
+                alli.Add(new Unit(DH.allyHandler.Units[input].Name, call.Health, call.Mana, call.Defence, call.Speed, Skills(input, DH.allyHandler)));
+            }
+            DH.allies = Armed(alli);
+        }
+        private void ManifestEnemy(int amount)
+        {
+            List<Unit> enem = new List<Unit>();
+            for (int i = 0; i < amount; i++)
+            {
+                int chosen = random.Next(DH.foeHandler.Units.Count);
+                var call = DH.foeHandler.Units[chosen].Stats;
+                enem.Add(new Unit(DH.foeHandler.Units[chosen].Name, call.Health, call.Mana, call.Defence, call.Speed, Skills(chosen, DH.foeHandler)));
+            }
+            DH.enemies = Armed(enem);
+        }
+        void SetBattleOrder()
+        {
+            List<Unit> units = new();
+            units.AddRange(DH.allies.All);
+            units.AddRange(DH.enemies.All);
+
+            DH.battleOrder = units.OrderBy(o => o.speed).ToList();
         }
         // Conversion from JsonSkill to Skill
         public List<Skill> Skills(int chosen, UnitJSONReader file)
@@ -55,86 +97,68 @@ namespace MightyMadness
         }
         #endregion
 
-        // Lists the current armies
-        public void ListArmies()
-        {
-            writer.WriteColored(ConsoleColor.Yellow, "- - - Armies List - - -", 0);
-            Console.WriteLine("");
-            Console.Write("Your units are: ");
-            foreach (Unit unit in allies)
-            {
-                writer.WriteColored(ConsoleColor.White, unit.Name + " (" + unit.LifePercentage() + "%) ", 0, ":", ConsoleColor.White, writer.WriteList((object[])unit.skills.ToArray()), 0, " / ");
-            }
-            Console.WriteLine("");
-            Console.Write("Your enemies are: ");
-            foreach (Unit unit in enemies)
-            {
-                writer.WriteColored(ConsoleColor.Gray, unit.Name + " (" + unit.LifePercentage() + "%) ", 0, ":", ConsoleColor.White, writer.WriteList((object[])unit.skills.ToArray()), 0, " / ");
-            }
-            Console.WriteLine("");
-        }
-
         #region "Combat turns"
         public void PlayerScenario(Unit unit, int target, int skillIndex)
         {
             try
             {
+                Unit enemy = DH.enemies.ToArray[target];
                 Skill chosenSkill = unit.skills[skillIndex];
-                SetHistory(unit.Name + " attacked " + enemies[target].Name + " with " + chosenSkill.Name + ", dealing " + chosenSkill.Damage + " damage");
-                Attack(unit, enemies[target], chosenSkill);
+
+                attackProtocol protocol = new attackProtocol(unit, enemy, chosenSkill);
+                DH.protocols.Add(protocol);
+
+                Attack(protocol);
+
+                SetHistory(unit.Name + " attacked " + enemy.Name + " with " + chosenSkill.Name + ", dealing " + chosenSkill.Damage + " damage");
                 writer.Flash(ConsoleColor.DarkRed, 250);
             }
-            catch (IndexOutOfRangeException)
+            catch (Exception e)
             {
-               Console.WriteLine("Selected skill not found");
+                Console.WriteLine(e + " Error occurred due to problems with input");
             }
         }
         public void FoeScenario(Unit unit)
         {
-            int ran1 = random.Next(0, allies.Count); // Random chosen from allies
+            int ran1 = random.Next(0, DH.allies.Count); // Random chosen from allies
             int ran2 = random.Next(0, unit.skills.Count); // Random chosen from enemy skills
-            SetHistory(unit.Name + " attacked " + allies[ran1].Name + " with " + unit.skills[ran2].Name + ", dealing " + unit.skills[ran2].Damage + " damage");
-            Attack(unit, allies[ran1], unit.skills[ran2]);
+            Unit target = DH.allies.ToArray[ran1];
+
+            attackProtocol protocol = new attackProtocol(unit, target, unit.skills[ran2]);
+            DH.protocols.Add(protocol);
+            Attack(protocol);
+
+            SetHistory(unit.Name + " attacked " + target.Name + " with " + unit.skills[ran2].Name + ", dealing " + unit.skills[ran2].Damage + " damage");
             writer.Flash(ConsoleColor.DarkRed, 50);
         }
         #endregion
 
-        // Damagedealer
-        public void Attack(Unit attacker, Unit attacked, Skill skillChosen)
+        public void Attack(attackProtocol prt)
         {
-            Skill choseSkill = attacker.skills[0];
-            try
+            if (prt.atk.UseSkill(prt.skill))
             {
-                choseSkill = skillChosen;
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                Console.WriteLine("Skill Index out of range, defaulting to basic attack");
-            }
-            if (attacker.UseSkill(choseSkill))
-            {
-                switch (choseSkill.Speciality)
+                switch (prt.skill.Speciality)
                 {
                     case 0: // Single Target
-                        if (attacked.Receive(choseSkill.Damage)) 
+                        if (prt.def.Receive(prt.skill.Damage))
                         {
-                            try { enemies.Remove(attacked); }
-                            catch { allies.Remove(attacked); }
+                            try { DH.enemies.Remove(prt.def); }
+                            catch { DH.allies.Remove(prt.def); }
                         }
                         break;
                     case 1: // Area Attack
-                        if (enemies.Contains(attacked))
+                        if (DH.enemies.Contains(prt.def))
                         {
-                            for (int i = enemies.Count - 1; i > -1; i--)
+                            for (int i = DH.enemies.Count - 1; i > -1; i--)
                             {
-                                if (enemies[i].Receive(choseSkill.Damage)) { enemies.Remove(enemies[i]); }
+                                if (prt.def.Receive(prt.skill.Damage)) { DH.enemies.Remove(prt.def); }
                             }
                         }
-                        else if (allies.Contains(attacked))
+                        else if (DH.allies.Contains(prt.def))
                         {
-                            for (int i = allies.Count - 1; i > -1; i--)
+                            for (int i = DH.allies.Count - 1; i > -1; i--)
                             {
-                                if (allies[i].Receive(choseSkill.Damage)) { allies.Remove(allies[i]); }
+                                if (prt.def.Receive(prt.skill.Damage)) { DH.allies.Remove(prt.def); }
                             }
                         }
                         break;
@@ -145,24 +169,98 @@ namespace MightyMadness
             }
         }
 
-        #region "Battle history"
-        private List<string> history = new();
-        public void SetHistory(string historize)
+        // Completes the given action in reverse, reverting any actions completed during that saved turn
+        public void Revert(attackProtocol protoAttack)
         {
-            history.Add(historize);
+            Unit atk = protoAttack.atk;
+            Unit def = protoAttack.def;
+            Skill skill = protoAttack.skill;
+
+            Skill newSkill = new Skill(skill.Name, skill.Damage, skill.ManaCost, skill.Speciality);
+
+            newSkill.damage = -newSkill.damage;
+            attackProtocol revertProto = new attackProtocol(atk, def, newSkill);
+            Attack(revertProto);
         }
-        public void ReadHistory()
+
+        // Lists the living units of both armies
+        public void ListArmies()
         {
-            writer.WriteColored(ConsoleColor.Yellow, "- - - Battle Results - - -", 0, 1);
-            foreach (string segment in history)
+            writer.WriteColored(ConsoleColor.Yellow, "- - - Armies List - - -", 0);
+            Console.WriteLine("");
+            Console.Write("Your units are: ");
+            foreach (Unit unit in DH.allies.All)
             {
-                Console.WriteLine(segment);
+                writer.WriteColored(ConsoleColor.White, unit.Name + " (" + unit.LifePercentage() + "%) ", 0, ":", ConsoleColor.White, writer.WriteList((object[])unit.skills.ToArray()), 0, " / ");
             }
+            Console.WriteLine("");
+            Console.Write("Your enemies are: ");
+            foreach (Unit unit in DH.enemies.All)
+            {
+                writer.WriteColored(ConsoleColor.Gray, unit.Name + " (" + unit.LifePercentage() + "%) ", 0, ":", ConsoleColor.White, writer.WriteList((object[])unit.skills.ToArray()), 0, " / ");
+            }
+            Console.WriteLine("");
         }
-        public void DeleteHistory()
-        {
-            history.Clear();
-        }
-        #endregion
+
+        #region "Battle history"
+        public void SetHistory(string historize)
+            {
+                DH.history.Add(historize);
+            }
+            public void ReadHistory()
+            {
+                writer.WriteColored(ConsoleColor.Yellow, "- - - Battle Results - - -", 0, 1);
+                foreach (string segment in DH.history)
+                {
+                    Console.WriteLine(segment);
+                }
+            }
+            public void DeleteHistory()
+            {
+                DH.history.Clear();
+            }
+            #endregion
     }
+    public struct attackProtocol
+    {
+        public attackProtocol(Unit attaker, Unit attaked, Skill skilled)
+        {
+            atk = attaker;
+            def = attaked;
+            skill = skilled;
+        }
+        public Unit atk;
+        public Unit def;
+        public Skill skill;
+    }
+    public struct ArmyData
+        {
+            public List<Unit> units;
+            public List<Unit> grave;
+
+            #region "Misc"
+            public void Sort()
+            {
+                units = units.OrderBy(o => o.speed).ToList();
+            }
+            public void Remove(Unit removed)
+            {
+                if (units.Contains(removed))
+                {
+                    grave.Add(removed);
+                    units.Remove(removed);
+                }
+            }
+            public bool Contains(Unit unit)
+            {
+                if (units.Contains(unit)) { return true; }
+                return false;
+            }
+            public List<Unit> All { get { return units; } }
+            public int Count { get { return units.Count; } }
+            public bool Any { get { return units.Any(); } }
+            public Unit[] ToArray { get { return units.ToArray(); } }
+
+            #endregion
+        }
 }

@@ -2,18 +2,19 @@
 {
     public class Unit
     {
-        // The actual stored data
+        #region Data
         private int hp;
         private int mana;
         private int defence;
-        private int speed;
         private string name;
 
-        float curHp;
-        float curMana;
-
         public List<Skill> skills;
-        // Data
+        public int speed;
+
+        public string Name { get { return name; } }
+
+        public float curHp;
+        float curMana;        
         public Unit(string name, int health, int mana, int defence, int speed, List<Skill> skills)
         {
             this.name = name;
@@ -28,17 +29,17 @@
             this.skills = skills;
             this.speed = speed;
         }
-        // Combat specifics
+        #endregion
+
+        // Reduces health by received damage by the correct amounts
         public bool Receive(int received)
         {
-            curHp = curHp - (received - defence);
+            if (received > 0) { curHp = curHp - (received - defence); }
+            else { curHp = curHp + -received - defence; }
             if (curHp <= 0) return true;
             return false;
         }
-
-        // Information Conversions
-        public string Name { get { return name; } }
-        public int Speed { get { return speed; } }
+        // Reduces mana by received cost by the correct amount
         public bool UseSkill(Skill skill)
         {
             if (skill.ManaCost <= curMana)
@@ -49,6 +50,7 @@
             Console.WriteLine("Failed to cast " + skill.Name);
             return false;
         }
+        // Returns a percentage taken from HP / MaxHP
         public float LifePercentage()
         {
             return curHp / hp * (float)100;

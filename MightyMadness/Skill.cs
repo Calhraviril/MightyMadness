@@ -4,7 +4,7 @@
     {
         // The actual stored data
         private string name;
-        private int damage;
+        public int damage;
         private int manaCost;
         private int speciality;
 
