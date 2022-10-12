@@ -34,7 +34,7 @@ while (gameActive)
             state = DH.BattleState.armyCreate;
             break;
         case DH.BattleState.armyCreate:
-            mainBattle.ManifestArmy(6);
+            mainBattle.ManifestArmy(3);
             state = DH.BattleState.battle;
             break;
         case DH.BattleState.battle:
@@ -58,9 +58,20 @@ while (gameActive)
             break;
         case DH.BattleState.gameOver:
             Console.Clear();
-            writer.WriteColored(ConsoleColor.Gray, "GAME OVER", 1);
+            writer.WriteColored(ConsoleColor.Gray, "GAME OVER", 1, "Press r to start again, or press any other letter to exit", 1, 0);
             Thread.Sleep(1000);
-            gameActive = false;
+
+            string finalCommand = "";
+            try
+            {
+                finalCommand = Console.ReadKey().KeyChar.ToString();
+            }
+            catch
+            {
+                Console.WriteLine("Exiting");
+            }
+            if (finalCommand == "r") { state = DH.BattleState.menu; }
+            else { gameActive = false; }
             break;
     }
 }

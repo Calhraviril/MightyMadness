@@ -62,7 +62,8 @@
             {
                 try
                 {
-                    listed = listed + " " + (orderPosition + 1) + ". " + DH.allyHandler.Units[orderPosition].Name;
+                    var unite = DH.allyHandler.Units[orderPosition];
+                    listed = listed + " " + (orderPosition + 1) + ". " + unite.Name + " ( " + unite.Stats.Cost + " )";
                     orderPosition++;
                 }
                 catch

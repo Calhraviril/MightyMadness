@@ -46,21 +46,28 @@ namespace MightyMadness
         // Creates both armies
         public void ManifestArmy(int amount)
         {
-            ManifestAlly(amount);
+            ManifestAlly();
             ManifestEnemy(amount);
             SetBattleOrder();
         }
-        private void ManifestAlly(int amount)
+        private void ManifestAlly()
         {
+            int costPoints = 3;
+
             List<Unit> alli = new List<Unit>();
             while (true)
             {
                 Console.Clear();
-                writer.WriteColored("Choose an unit ", 1, writer.ListJsonUnit());
-                int input = Convert.ToInt32(Console.ReadKey().KeyChar.ToString());
+                writer.WriteColored("Choose an unit: " + costPoints, 1, writer.ListJsonUnit());
+                int input = Convert.ToInt32(Console.ReadKey().KeyChar.ToString()) - 1;
 
                 var call = DH.allyHandler.Units[input].Stats;
                 alli.Add(new Unit(DH.allyHandler.Units[input].Name, call.Health, call.Mana, call.Defence, call.Speed, Skills(input, DH.allyHandler)));
+
+                if ((costPoints - call.Cost) > 0) { costPoints = costPoints - call.Cost; }
+                else { break; }
+
+
             }
             DH.allies = Armed(alli);
         }
