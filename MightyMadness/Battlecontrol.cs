@@ -66,8 +66,6 @@ namespace MightyMadness
 
                 if ((costPoints - call.Cost) > 0) { costPoints = costPoints - call.Cost; }
                 else { break; }
-
-
             }
             DH.allies = Armed(alli);
         }
